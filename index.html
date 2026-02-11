@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Artist Portfolio</title>
+    <style>
+        /* --- 1. CORE STYLES --- */
+        :root {
+            --bg-dark: #121212;
+            --bg-card: #1e1e1e;
+            --accent: #c9a46a; 
+            --text: #e0e0e0;
+            --text-muted: #888888;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text);
+            font-family: 'Helvetica Neue', sans-serif;
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+
+        /* --- 2. NAVIGATION & MENU --- */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(18, 18, 18, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .brand span { color: var(--accent); }
+
+        .menu-icon {
+            font-size: 1.5rem;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        /* Full Screen Menu Overlay */
+        #menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(18, 18, 18, 0.98);
+            z-index: 1000;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .menu-btn-item {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            width: 250px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .menu-btn-item:active {
+            background: var(--accent);
+            color: #000;
+        }
+
+        /* --- 3. REDIRECT SECTIONS --- */
+        #about-section, #contact-section {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: var(--bg-dark);
+            z-index: 1100;
+            padding: 40px 25px;
+            overflow-y: auto;
+        }
+
+        .back-btn {
+            font-size: 1rem;
+            color: var(--accent);
+            cursor: pointer;
+            margin-bottom: 30px;
+            display: inline-block;
+            text-transform: uppercase;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+
+        .section-text {
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        /* --- 4. HERO SECTION --- */
+        header { padding: 40px 20px; text-align: center; }
+        header h1 { font-size: 2.2rem; margin-bottom: 10px; background: linear-gradient(to right, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        header p { color: var(--text-muted); font-size: 0.95rem; max-width: 500px; margin: 0 auto; }
+
+        /* --- 5. FILTER BUTTONS --- */
+        .filters { display: flex; gap: 12px; padding: 0 20px 20px 20px; overflow-x: auto; scrollbar-width: none; justify-content: center; }
+        .filter-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); padding: 10px 20px; border-radius: 25px; font-size: 0.85rem; white-space: nowrap; transition: 0.3s; cursor: pointer; }
+        .filter-btn.active { background: var(--accent); color: #000; font-weight: 600; box-shadow: 0 4px 15px rgba(201, 164, 106, 0.3); }
+
+        /* --- 6. GALLERY GRID --- */
+        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; padding: 0 15px; }
+        .art-item { position: relative; background: var(--bg-card); border-radius: 12px; overflow: hidden; aspect-ratio: 3/4; border: 1px solid rgba(255,255,255,0.05); transition: 0.2s; }
+        .art-item:active { transform: scale(0.98); }
+        .art-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .overlay { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 20px 10px 10px 10px; }
+        .overlay h3 { font-size: 0.9rem; color: #fff; }
+        .overlay p { font-size: 0.7rem; color: var(--accent); text-transform: uppercase; }
+
+        /* --- 7. MODAL --- */
+        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(5px); align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+        .modal.show { opacity: 1; }
+        .modal img { max-width: 95%; max-height: 80vh; border-radius: 4px; }
+        .close-btn { position: absolute; top: 20px; right: 20px; color: white; font-size: 2.5rem; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="brand">ACE☆<span>ARTS</span></div>
+        <div class="menu-icon" onclick="toggleMenu()">&#9776;</div> 
+    </nav>
+
+    <div id="menu-overlay">
+        <div class="close-btn" onclick="toggleMenu()">&times;</div>
+        <div class="menu-btn-item" onclick="showSection('about')">About Me</div>
+        <div class="menu-btn-item" onclick="showSection('contact')">Contact Me</div>
+    </div>
+
+    <div id="about-section">
+        <div class="back-btn" onclick="hideSection('about')">← Back to Gallery</div>
+        <h2 class="section-title">About Me</h2>
+        <p class="section-text"><strong>Naomi Grace Austria</strong></p>
+        <p class="section-text">Age: 19 years old</p>
+        <p class="section-text">Hobbies: Handcrafts, Drawing, Arts, and Painting</p>
+        <p class="section-text">Skills: Arts</p>
+    </div>
+
+    <div id="contact-section">
+        <div class="back-btn" onclick="hideSection('contact')">← Back to Gallery</div>
+        <h2 class="section-title">Contact Me</h2>
+        <p class="section-text">Email: namigraceee@gmail.com</p>
+        <p class="section-text">Feel free to reach out for collaborations or inquiries regarding my art and technical plates.</p>
+    </div>
+
+    <header id="main-header">
+        <h1>Selected Works</h1>
+        <p>My collection of technical plates, digital illustrations, and traditional sketches.</p>
+    </header>
+
+    <div class="filters">
+        <button class="filter-btn active" onclick="filterSelection('all', this)">All</button>
+        <button class="filter-btn" onclick="filterSelection('plate', this)">Plates</button>
+        <button class="filter-btn" onclick="filterSelection('personal', this)">Personal Arts</button>
+        <button class="filter-btn" onclick="filterSelection('digital', this)">Digital & Crafts</button>
+    </div>
+
+    <main class="gallery">
+        <div class="art-item personal">
+            <img src="https://i.imgur.com/K3TmYRR.jpeg" alt="Small clay dog" onclick="openModal(this)">
+            <div class="overlay">
+                <h3>Sleeping Pup</h3>
+                <p>Personal Art • Clay Sculpture</p>
+            </div>
+        </div>
+
+        <div class="art-item digital">
+            <img src="https://i.imgur.com/Do4Sqv8.jpeg" alt="Digital illustration" onclick="openModal(this)">
+            <div class="overlay">
+                <h3>Floral Gift</h3>
+                <p>Mixed Media • Digital & Crafts</p>
+            </div>
+        </div>
+    </main>
+
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <div class="close-btn">&times;</div>
+        <img id="modalImg" src="">
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('menu-overlay');
+            menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        function showSection(id) {
+            toggleMenu();
+            document.getElementById(id + '-section').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideSection(id) {
+            document.getElementById(id + '-section').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function filterSelection(category, btn) {
+            let buttons = document.getElementsByClassName("filter-btn");
+            for (let i = 0; i < buttons.length; i++) { buttons[i].classList.remove("active"); }
+            btn.classList.add("active");
+
+            let items = document.getElementsByClassName("art-item");
+            for (let i = 0; i < items.length; i++) {
+                if (category == "all" || items[i].classList.contains(category)) {
+                    items[i].style.display = "block";
+                } else {
+                    items[i].style.display = "none";
+                }
+            }
+        }
+
+        const modal = document.getElementById("imageModal");
+        const modalImg = document.getElementById("modalImg");
+
+        function openModal(element) {
+            modal.style.display = "flex";
+            setTimeout(() => { modal.classList.add("show"); }, 10);
+            modalImg.src = element.src;
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.remove("show");
+            setTimeout(() => { modal.style.display = "none"; document.body.style.overflow = 'auto'; }, 300);
+        }
+    </script>
+</body>
+</html>
